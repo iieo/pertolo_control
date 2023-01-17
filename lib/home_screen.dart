@@ -21,8 +21,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = max(200, MediaQuery.of(context).size.width * 0.3);
-    double height = 40;
+    double width = max(200, MediaQuery.of(context).size.width - 100);
+    double height = 60;
     return Container(
       color: App.primaryColor,
       child: Center(

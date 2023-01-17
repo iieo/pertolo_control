@@ -24,7 +24,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return ScreenContainer(
         child: Center(
             child: Container(
-      width: MediaQuery.of(context).size.width / 3,
+      width: MediaQuery.of(context).size.width - 100,
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       alignment: Alignment.center,
       child: Column(

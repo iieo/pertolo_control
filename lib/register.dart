@@ -48,6 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextFormField(
             style: const TextStyle(color: App.secondaryColor),
@@ -102,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 45,
           ),
           ElevatedButton(
             onPressed: _registerAndSaveData,

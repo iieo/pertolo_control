@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pertolo_control/create_screen.dart';
+import 'package:pertolo_control/edit_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -100,6 +101,13 @@ class App extends StatelessWidget {
             path: 'create',
             builder: (BuildContext context, GoRouterState state) {
               return const CreateScreen();
+            },
+          ),
+          GoRoute(
+            name: 'edit',
+            path: 'edit',
+            builder: (BuildContext context, GoRouterState state) {
+              return const EditScreen();
             },
           ),
         ],

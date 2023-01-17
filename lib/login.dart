@@ -42,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextFormField(
             style: const TextStyle(color: App.secondaryColor),
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(
-            height: 20,
+            height: 45,
           ),
           ElevatedButton(
             onPressed: _login,
