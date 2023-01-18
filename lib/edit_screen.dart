@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -75,8 +73,8 @@ class _EditListState extends State<EditList> {
               height: height,
               child: DropdownButton<String>(
                   value: category,
-                  style: const TextStyle(color: App.secondaryColor),
-                  dropdownColor: App.primaryColor,
+                  style: ThemeData.dark().textTheme.button,
+                  dropdownColor: App.secondaryColor,
                   items: widget.categories
                       .map<DropdownMenuItem<String>>((String val) {
                     return DropdownMenuItem<String>(
@@ -93,8 +91,8 @@ class _EditListState extends State<EditList> {
               height: height,
               child: DropdownButton<ItemType>(
                   value: type,
-                  style: const TextStyle(color: App.secondaryColor),
-                  dropdownColor: App.primaryColor,
+                  style: ThemeData.dark().textTheme.button,
+                  dropdownColor: App.secondaryColor,
                   items: [ItemType.question, ItemType.task]
                       .map<DropdownMenuItem<ItemType>>((ItemType val) =>
                           DropdownMenuItem<ItemType>(
@@ -115,9 +113,9 @@ class _EditListState extends State<EditList> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                   title: Text(items[index].content,
-                      style: const TextStyle(color: App.secondaryColor)),
+                      style: ThemeData.dark().textTheme.headline6),
                   subtitle: Text(items[index].creator,
-                      style: const TextStyle(color: App.secondaryColor)),
+                      style: ThemeData.dark().textTheme.subtitle1),
                   trailing: TrailingOptions(
                       items: items,
                       index: index,
@@ -128,6 +126,7 @@ class _EditListState extends State<EditList> {
             separatorBuilder: (context, index) {
               return const Divider(
                 thickness: 2,
+                color: App.secondaryColor,
               );
             },
           )),
@@ -157,7 +156,6 @@ class TrailingOptions extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        //deletebutton
         Visibility(
           visible:
               items[index].creatorUid == FirebaseAuth.instance.currentUser!.uid,
@@ -167,10 +165,10 @@ class TrailingOptions extends StatelessWidget {
                 items.removeAt(index);
                 update();
               },
-              icon: const Icon(Icons.delete, color: App.secondaryColor)),
+              icon: const Icon(Icons.delete, color: App.whiteColor)),
         ),
         const SizedBox(width: 20),
-        Text(votes, style: const TextStyle(color: App.secondaryColor)),
+        Text(votes, style: const TextStyle(color: App.whiteColor)),
         IconButton(
             onPressed: () async {
               if (items[index]
@@ -184,15 +182,15 @@ class TrailingOptions extends StatelessWidget {
                     .upvotes
                     .add(FirebaseAuth.instance.currentUser!.uid);
               }
-              await items[index].save();
+              await items[index].updateVotes();
               update();
             },
             icon: Icon(Icons.thumb_up,
                 color: items[index]
                         .upvotes
                         .contains(FirebaseAuth.instance.currentUser!.uid)
-                    ? Colors.black
-                    : App.secondaryColor)),
+                    ? App.secondaryColor
+                    : App.whiteColor)),
         IconButton(
             onPressed: () async {
               if (items[index]
@@ -206,15 +204,15 @@ class TrailingOptions extends StatelessWidget {
                     .downvotes
                     .add(FirebaseAuth.instance.currentUser!.uid);
               }
-              await items[index].save();
+              await items[index].updateVotes();
               update();
             },
             icon: Icon(Icons.thumb_down,
                 color: items[index]
                         .downvotes
                         .contains(FirebaseAuth.instance.currentUser!.uid)
-                    ? Colors.black
-                    : App.secondaryColor)),
+                    ? App.secondaryColor
+                    : App.whiteColor)),
       ],
     );
   }

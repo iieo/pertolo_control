@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pertolo_control/main.dart';
@@ -45,13 +47,15 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double width = max(200, MediaQuery.of(context).size.width - 100);
+    double height = 60;
     return Form(
       key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextFormField(
-            style: const TextStyle(color: App.secondaryColor),
+            style: ThemeData.dark().textTheme.labelMedium,
             key: const ValueKey('username'),
             validator: (value) {
               if (value!.isEmpty || value.length < 4) {
@@ -62,12 +66,12 @@ class _SignupScreenState extends State<SignupScreen> {
             onSaved: (value) {
               _username = value!;
             },
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
                 labelText: 'Benutzername',
-                labelStyle: TextStyle(color: App.secondaryColor)),
+                labelStyle: ThemeData.dark().textTheme.labelMedium),
           ),
           TextFormField(
-            style: const TextStyle(color: App.secondaryColor),
+            style: ThemeData.dark().textTheme.labelMedium,
             key: const ValueKey('email'),
             validator: (value) {
               if (value!.isEmpty || !value.contains('@')) {
@@ -79,13 +83,13 @@ class _SignupScreenState extends State<SignupScreen> {
               _email = value!;
             },
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'E-Mail',
-              labelStyle: TextStyle(color: App.secondaryColor),
+              labelStyle: ThemeData.dark().textTheme.labelMedium,
             ),
           ),
           TextFormField(
-            style: const TextStyle(color: App.secondaryColor),
+            style: ThemeData.dark().textTheme.labelMedium,
             key: const ValueKey('password'),
             validator: (value) {
               if (value!.isEmpty || value.length < 7) {
@@ -97,17 +101,26 @@ class _SignupScreenState extends State<SignupScreen> {
               _password = value!;
             },
             obscureText: true,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Passwort',
-              labelStyle: TextStyle(color: App.secondaryColor),
+              labelStyle: ThemeData.dark().textTheme.labelMedium,
             ),
           ),
           const SizedBox(
             height: 45,
           ),
-          ElevatedButton(
-            onPressed: _registerAndSaveData,
-            child: const Text('Registrieren'),
+          SizedBox(
+            height: height,
+            width: width,
+            child: ElevatedButton(
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: App.secondaryColor),
+              onPressed: _registerAndSaveData,
+              child: const Text('Registrieren'),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
           TextButton(
             onPressed: () {

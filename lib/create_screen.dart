@@ -50,33 +50,9 @@ class _CreateFormState extends State<CreateForm> {
   ItemType type = ItemType.task;
 
   void _createItem(BuildContext context) {
-    if (content.trim().isEmpty || content.trim().length < 5) {
-      SnackBar snackBar =
-          const SnackBar(content: Text('Bitte gib einen Inhalt ein'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return;
-    }
-
-    Map<String, String> docData = {
-      'creatorUid': FirebaseAuth.instance.currentUser!.uid,
-      'creator': FirebaseAuth.instance.currentUser!.displayName!,
-      'content': content,
-    };
-
-    try {
-      FirebaseFirestore.instance
-          .collection('game')
-          .doc(category)
-          .collection(type.name)
-          .add(docData);
-    } catch (e) {
-      SnackBar snackBar = SnackBar(content: Text('Error: $e'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return;
-    }
-
-    SnackBar snackBar = const SnackBar(content: Text('Aufgabe/Frage erstellt'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    String message = PertoloItem.createItem(content, category, type);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
 
     setState(() {
       content = "";
@@ -102,14 +78,14 @@ class _CreateFormState extends State<CreateForm> {
                     child: TextField(
                       minLines: 1,
                       maxLines: 5,
-                      style: const TextStyle(color: App.secondaryColor),
+                      style: ThemeData.dark().textTheme.labelMedium,
                       key: const ValueKey('content'),
                       controller: TextEditingController(text: content),
                       onChanged: (value) => content = value,
                       keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Aufgabe/Frage',
-                        labelStyle: TextStyle(color: App.secondaryColor),
+                        labelStyle: ThemeData.dark().textTheme.labelMedium,
                       ),
                     )),
 
@@ -119,8 +95,8 @@ class _CreateFormState extends State<CreateForm> {
                     height: height,
                     child: DropdownButton<String>(
                         value: category,
-                        style: const TextStyle(color: App.secondaryColor),
-                        dropdownColor: App.primaryColor,
+                        style: ThemeData.dark().textTheme.button,
+                        dropdownColor: App.secondaryColor,
                         items: widget.categories
                             .map<DropdownMenuItem<String>>((String val) {
                           return DropdownMenuItem<String>(
@@ -139,8 +115,8 @@ class _CreateFormState extends State<CreateForm> {
                     height: height,
                     child: DropdownButton<ItemType>(
                         value: type,
-                        style: const TextStyle(color: App.secondaryColor),
-                        dropdownColor: App.primaryColor,
+                        style: ThemeData.dark().textTheme.button,
+                        dropdownColor: App.secondaryColor,
                         items: [ItemType.question, ItemType.task]
                             .map<DropdownMenuItem<ItemType>>((ItemType val) =>
                                 DropdownMenuItem<ItemType>(
@@ -156,9 +132,11 @@ class _CreateFormState extends State<CreateForm> {
                     height: height,
                     width: width,
                     child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: App.secondaryColor),
                         onPressed: () => _createItem(context),
-                        child: const Text('Create',
-                            style: TextStyle(color: App.primaryColor))))
+                        child: Text('Create',
+                            style: ThemeData.dark().textTheme.button)))
               ])),
           const Text(
               "Bitte ersetze alle Spielernamen durch einen Unterstrich ('_')",

@@ -30,8 +30,10 @@ void main() async {
 class App extends StatelessWidget {
   App({super.key});
 
-  static const Color primaryColor = Colors.green;
-  static const Color secondaryColor = Color.fromARGB(255, 254, 250, 224);
+  static const Color primaryColor = Color(0xFF1A1B1B);
+  static const int white = 200;
+  static const Color whiteColor = Color.fromARGB(255, 228, 226, 223);
+  static const Color secondaryColor = Color(0xFF386641);
   static const String name = 'Pertol Control';
   static const String version = '1.0.0';
   static const String buildNumber = '1';
@@ -116,20 +118,40 @@ class App extends StatelessWidget {
   );
 
   final ThemeData _themeData = ThemeData(
-    visualDensity: VisualDensity.adaptivePlatformDensity,
-    primarySwatch: const MaterialColor(0xFFFEFAE0, {
-      50: Color(0xfff2f2f2),
-      100: Color(0xffe6e6e6),
-      200: Color(0xffcccccc),
-      300: Color(0xffb3b3b3),
-      400: Color(0xff999999),
-      500: Color(0xff808080),
-      600: Color(0xff666666),
-      700: Color(0xff4d4d4d),
-      800: Color(0xff333333),
-      900: Color(0xff1a1a1a)
-    }),
-  );
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      primarySwatch: const MaterialColor(0xFFFEFAE0, {
+        50: Color(0xfff2f2f2),
+        100: Color(0xffe6e6e6),
+        200: Color(0xffcccccc),
+        300: Color(0xffb3b3b3),
+        400: Color(0xff999999),
+        500: Color(0xff808080),
+        600: Color(0xff666666),
+        700: Color(0xff4d4d4d),
+        800: Color(0xff333333),
+        900: Color(0xff1a1a1a)
+      }),
+      primaryColor: primaryColor,
+      textTheme: const TextTheme(
+        button: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.normal,
+          decoration: TextDecoration.none,
+          color: App.whiteColor,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.normal,
+          decoration: TextDecoration.none,
+          color: App.whiteColor,
+        ),
+        subtitle1: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.normal,
+          decoration: TextDecoration.none,
+          color: Color.fromARGB(255, 150, 150, 150),
+        ),
+      ));
 }
 
 class NotFoundScreen extends StatelessWidget {
