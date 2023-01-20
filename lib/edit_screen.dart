@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pertolo_control/ScreenContainer.dart';
-import 'package:pertolo_control/main.dart';
+import 'package:pertolo_control/screen_container.dart';
+import 'package:pertolo_control/app.dart';
 import 'package:pertolo_control/pertolo_item.dart';
 
 class EditScreen extends StatelessWidget {

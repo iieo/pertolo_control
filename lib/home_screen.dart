@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pertolo_control/main.dart';
+import 'package:pertolo_control/app.dart';
 import 'dart:math';
 
 class HomeScreen extends StatefulWidget {

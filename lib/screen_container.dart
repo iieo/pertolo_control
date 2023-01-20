@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pertolo_control/main.dart';
+import 'package:pertolo_control/app.dart';
 
 class ScreenContainer extends StatelessWidget {
   final Widget child;

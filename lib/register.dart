@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pertolo_control/main.dart';
+import 'package:pertolo_control/app.dart';
 
 class SignupScreen extends StatefulWidget {
   final Function toggleIsLogin;
