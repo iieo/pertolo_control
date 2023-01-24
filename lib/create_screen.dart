@@ -1,11 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pertolo_control/components/pertolo_button.dart';
+import 'package:pertolo_control/components/pertolo_dropdown.dart';
 import 'package:pertolo_control/screen_container.dart';
 import 'package:pertolo_control/app.dart';
 import 'package:pertolo_control/pertolo_item.dart';
 
 class CreateScreen extends StatelessWidget {
-  const CreateScreen({super.key});
+  final String? pertoloItemId;
+  final String? pertoloItemCategory;
+  final String? pertoloItemType;
+  const CreateScreen(
+      {super.key,
+      this.pertoloItemId,
+      this.pertoloItemCategory,
+      this.pertoloItemType});
   Future<List<String>> _loadCategories() async {
     try {
       QuerySnapshot snapshot =
@@ -16,26 +26,69 @@ class CreateScreen extends StatelessWidget {
     }
   }
 
+  Future<PertoloItem?> _loadPertoloItem() async {
+    if (pertoloItemId == null ||
+        pertoloItemCategory == null ||
+        pertoloItemType == null) {
+      return null;
+    }
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('game')
+          .doc(pertoloItemCategory)
+          .collection(pertoloItemType!)
+          .doc(pertoloItemId)
+          .get();
+      return PertoloItem.fromMap(
+          snapshot.id,
+          snapshot.data() as Map<String, dynamic>,
+          pertoloItemCategory!,
+          ItemType.values
+              .firstWhere((element) => element.name == pertoloItemType));
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        builder: ((context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data == null || snapshot.hasError) {
-              return const Text("Cannot load categories data");
-            }
-            return CreateForm(categories: snapshot.data!);
-          } else {
-            return const Center(child: CircularProgressIndicator());
+      builder: ((context, pertoloSnapshot) {
+        if (pertoloSnapshot.connectionState == ConnectionState.done) {
+          if (pertoloSnapshot.hasError) {
+            return const Text(
+                "Cannot load pertolo item data. No internet connection?");
           }
-        }),
-        future: _loadCategories());
+          return FutureBuilder(
+            builder: ((context, categoriesSnapshot) {
+              if (categoriesSnapshot.connectionState == ConnectionState.done) {
+                if (categoriesSnapshot.data == null ||
+                    categoriesSnapshot.hasError) {
+                  return const Text(
+                      "Cannot load categories data. No internet connection?");
+                }
+                return CreateForm(
+                    categories: categoriesSnapshot.data!,
+                    pertoloItem: pertoloSnapshot.data);
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            }),
+            future: _loadCategories(),
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      }),
+      future: _loadPertoloItem(),
+    );
   }
 }
 
 class CreateForm extends StatefulWidget {
   final List<String> categories;
-  const CreateForm({super.key, required this.categories});
+  final PertoloItem? pertoloItem;
+  const CreateForm({super.key, required this.categories, this.pertoloItem});
 
   @override
   State<CreateForm> createState() => _CreateFormState();
@@ -46,14 +99,48 @@ class _CreateFormState extends State<CreateForm> {
   String category = "normal";
   ItemType type = ItemType.task;
 
+  @override
+  void initState() {
+    super.initState();
+    if (_pertoloItemIsSet()) {
+      setState(() {
+        content = widget.pertoloItem!.content;
+        category = widget.pertoloItem!.category;
+        type = widget.pertoloItem!.type;
+      });
+    }
+  }
+
+  void _updateItem(BuildContext context) async {
+    String message = await PertoloItem.updateItem(
+        content, category, type, widget.pertoloItem!);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+
+    GoRouter.of(context).go('/edit');
+  }
+
   void _createItem(BuildContext context) {
     String message = PertoloItem.createItem(content, category, type);
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
-
     setState(() {
       content = "";
     });
+  }
+
+  void _confirmItem(BuildContext context) {
+    if (_pertoloItemIsSet()) {
+      _updateItem(context);
+    } else {
+      _createItem(context);
+    }
+  }
+
+  bool _pertoloItemIsSet() {
+    return widget.pertoloItem != null;
   }
 
   @override
@@ -87,53 +174,38 @@ class _CreateFormState extends State<CreateForm> {
                     )),
 
                 // dropdownbutton for category
-                SizedBox(
-                    width: width,
-                    height: height,
-                    child: DropdownButton<String>(
-                        value: category,
-                        style: ThemeData.dark().textTheme.button,
-                        dropdownColor: App.secondaryColor,
-                        items: widget.categories
-                            .map<DropdownMenuItem<String>>((String val) {
-                          return DropdownMenuItem<String>(
-                            value: val,
-                            child: Text(val),
-                          );
-                        }).toList(),
-                        onChanged: (String? val) {
-                          setState(() {
-                            category = val!;
-                          });
-                        })),
 
-                SizedBox(
-                    width: width,
-                    height: height,
-                    child: DropdownButton<ItemType>(
-                        value: type,
-                        style: ThemeData.dark().textTheme.button,
-                        dropdownColor: App.secondaryColor,
-                        items: [ItemType.question, ItemType.task]
-                            .map<DropdownMenuItem<ItemType>>((ItemType val) =>
-                                DropdownMenuItem<ItemType>(
-                                    value: val, child: Text(val.name)))
-                            .toList(),
-                        onChanged: (ItemType? val) {
-                          setState(() {
-                            type = val!;
-                          });
-                        })),
+                PertoloDropdown<String>(
+                    items: widget.categories
+                        .map<DropdownMenuItem<String>>((String val) {
+                      return DropdownMenuItem<String>(
+                        value: val,
+                        child: Text(val),
+                      );
+                    }).toList(),
+                    value: category,
+                    onChanged: (String? val) {
+                      setState(() {
+                        category = val!;
+                      });
+                    }),
+
+                PertoloDropdown<ItemType>(
+                    items: [ItemType.question, ItemType.task]
+                        .map<DropdownMenuItem<ItemType>>((ItemType val) =>
+                            DropdownMenuItem<ItemType>(
+                                value: val, child: Text(val.name)))
+                        .toList(),
+                    value: type,
+                    onChanged: (ItemType? val) {
+                      setState(() {
+                        type = val!;
+                      });
+                    }),
                 const SizedBox(height: 45),
-                SizedBox(
-                    height: height,
-                    width: width,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: App.secondaryColor),
-                        onPressed: () => _createItem(context),
-                        child: Text('Create',
-                            style: ThemeData.dark().textTheme.button)))
+                PertoloButton(
+                    onPressed: () => _confirmItem(context),
+                    text: _pertoloItemIsSet() ? "Bearbeiten" : "Erstellen")
               ])),
           const Text(
               "Bitte ersetze alle Spielernamen durch einen Unterstrich ('_')",

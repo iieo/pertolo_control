@@ -42,14 +42,17 @@ class PertoloItem {
       String id, Map<String, dynamic> map, String category, ItemType type) {
     var timestampCreated = map['created'];
     var timestampUpdated = map['updated'];
+    bool invalid = false;
     if (timestampCreated is String) {
       timestampCreated = Timestamp.now();
+      invalid = true;
     }
     if (timestampUpdated is String) {
+      invalid = true;
       timestampUpdated = Timestamp.now();
     }
 
-    return PertoloItem(
+    PertoloItem pertoloItem = PertoloItem(
         id: id,
         creatorUid: map['creatorUid'],
         creator: map['creator'],
@@ -60,6 +63,11 @@ class PertoloItem {
         downvotes: List<String>.from(map['downvotes'] ?? []),
         created: timestampCreated.toDate(),
         updated: timestampUpdated.toDate());
+
+    if (invalid) {
+      pertoloItem.saveDate();
+    }
+    return pertoloItem;
   }
 
   static Future<List<PertoloItem>> loadPertoloItems(
@@ -74,6 +82,7 @@ class PertoloItem {
           .map((doc) => PertoloItem.fromMap(
               doc.id, doc.data() as Map<String, dynamic>, category, type))
           .toList();
+      items.sort((a, b) => b.updated.compareTo(a.updated));
       return items;
     } catch (e) {
       print(e);
@@ -90,6 +99,31 @@ class PertoloItem {
       'creator': FirebaseAuth.instance.currentUser!.displayName!,
       'content': content,
       'created': Timestamp.now(),
+      'updated': Timestamp.now(),
+    };
+    try {
+      FirebaseFirestore.instance
+          .collection('game')
+          .doc(category)
+          .collection(type.name)
+          .add(docData);
+    } catch (e) {
+      return 'Fehler beim Speichern: $e';
+    }
+    return 'Aufgabe gespeichert';
+  }
+
+  static Future<String> updateItem(String content, String category,
+      ItemType type, PertoloItem oldItem) async {
+    await oldItem.delete();
+    if (content.trim().isEmpty || content.trim().length < 5) {
+      return 'Bitte gib einen Inhalt ein';
+    }
+    Map<String, dynamic> docData = {
+      'creatorUid': FirebaseAuth.instance.currentUser!.uid,
+      'creator': FirebaseAuth.instance.currentUser!.displayName!,
+      'content': content,
+      'created': Timestamp.fromDate(oldItem.created),
       'updated': Timestamp.now(),
     };
     try {
@@ -145,4 +179,25 @@ class PertoloItem {
   }
 }
 
-enum ItemType { task, question }
+enum ItemType {
+  task,
+  question,
+  category,
+  punishment;
+
+  @override
+  String toString() {
+    switch (this) {
+      case ItemType.task:
+        return 'task';
+      case ItemType.question:
+        return 'question';
+      case ItemType.category:
+        return 'category';
+      case ItemType.punishment:
+        return 'punishment';
+      default:
+        return 'task';
+    }
+  }
+}

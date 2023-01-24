@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pertolo_control/app.dart';
 import 'dart:math';
 
+import 'package:pertolo_control/components/pertolo_button.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -56,8 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = max(200, MediaQuery.of(context).size.width - 100);
-    double height = 60;
     return Container(
       color: App.primaryColor,
       child: Center(
@@ -76,25 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (snapshot.data == true) {
                   return Column(
                     children: [
-                      SizedBox(
-                          height: height,
-                          width: width,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: App.secondaryColor),
-                              onPressed: () => _navigateToCreateScreen(context),
-                              child: Text('Create',
-                                  style: ThemeData.dark().textTheme.button))),
+                      PertoloButton(
+                          onPressed: () => _navigateToCreateScreen(context),
+                          text: "Create"),
                       const SizedBox(height: 20),
-                      SizedBox(
-                          height: height,
-                          width: width,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: App.secondaryColor),
-                              onPressed: () => _navigateToEditScreen(context),
-                              child: Text('Edit',
-                                  style: ThemeData.dark().textTheme.button))),
+                      PertoloButton(
+                          onPressed: () => _navigateToEditScreen(context),
+                          text: "Edit"),
+                      const SizedBox(height: 20),
+                      PertoloButton(onPressed: _logout, text: "Ausloggen"),
                     ],
                   );
                 } else {
@@ -104,18 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text("Bitte verifiziere deine E-Mail-Adresse",
                           style: ThemeData.dark().textTheme.button),
                       const SizedBox(height: 20),
-                      SizedBox(
-                          height: height,
-                          width: width,
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: App.secondaryColor),
-                              onPressed: _sendAgain,
-                              child: Text(
-                                  alreadySent
-                                      ? 'Überprüfen'
-                                      : 'Link erneut senden',
-                                  style: ThemeData.dark().textTheme.button))),
+                      PertoloButton(
+                          onPressed: _sendAgain, text: "Erneut senden"),
+                      const SizedBox(height: 20),
+                      PertoloButton(onPressed: _logout, text: "Ausloggen"),
                     ],
                   );
                 }
@@ -125,16 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
             future: _userEmailVerified(),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-              height: height,
-              width: width,
-              child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: App.secondaryColor),
-                  onPressed: () => _logout(),
-                  child: Text('Logout',
-                      style: ThemeData.dark().textTheme.button))),
         ],
       )),
     );

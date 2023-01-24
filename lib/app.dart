@@ -82,7 +82,16 @@ class App extends StatelessWidget {
             name: 'create',
             path: 'create',
             builder: (BuildContext context, GoRouterState state) {
-              return const CreateScreen();
+              //query params
+              String? pertoloItemId = state.queryParams['pertoloItemId'];
+              String? pertoloItemCategory =
+                  state.queryParams['pertoloItemCategory'];
+              String? pertoloItemType = state.queryParams['pertoloItemType'];
+              return CreateScreen(
+                pertoloItemCategory: pertoloItemCategory,
+                pertoloItemId: pertoloItemId,
+                pertoloItemType: pertoloItemType,
+              );
             },
           ),
           GoRoute(
@@ -125,11 +134,11 @@ class App extends StatelessWidget {
           decoration: TextDecoration.none,
           color: App.whiteColor,
         ),
-        subtitle1: TextStyle(
+        headline6: TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.normal,
           decoration: TextDecoration.none,
-          color: Color.fromARGB(255, 150, 150, 150),
+          color: App.whiteColor,
         ),
       ));
 }

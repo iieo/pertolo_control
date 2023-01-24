@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pertolo_control/app.dart';
+import 'package:pertolo_control/components/pertolo_button.dart';
 
 class LoginScreen extends StatefulWidget {
   final Function toggleIsLogin;
@@ -41,8 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = max(200, MediaQuery.of(context).size.width - 100);
-    double height = 60;
     return Form(
       key: _formKey,
       child: Column(
@@ -87,15 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(
             height: 45,
           ),
-          SizedBox(
-              height: height,
-              width: width,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: App.secondaryColor),
-                onPressed: _login,
-                child: const Text('Login'),
-              )),
+          PertoloButton(onPressed: _login, text: "Anmelden"),
           const SizedBox(
             height: 20,
           ),
