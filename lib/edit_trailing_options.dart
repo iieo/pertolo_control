@@ -106,11 +106,7 @@ class TrailingOptions extends StatelessWidget {
             itemBuilder: (context) => _buildPopupMenuItemList(items[index]),
             onSelected: (String value) async {
               if (value == "edit") {
-                GoRouter.of(context).goNamed("create", queryParams: {
-                  "pertoloItemId": items[index].id,
-                  "pertoloItemCategory": items[index].category,
-                  "pertoloItemType": items[index].type.toString(),
-                });
+                GoRouter.of(context).goNamed("editItem", extra: items[index]);
               } else if (value == "delete") {
                 await items[index].delete();
                 items.removeAt(index);

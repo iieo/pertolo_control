@@ -17,7 +17,6 @@ class _SignupScreenState extends State<SignupScreen> {
   String _username = '';
   String _email = '';
   String _password = '';
-  bool _isAccepted = false;
   final _formKey = GlobalKey<FormState>();
 
   void _registerAndSaveData() async {

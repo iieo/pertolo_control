@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:pertolo_control/create_screen.dart';
 import 'package:pertolo_control/edit_screen.dart';
 import 'package:pertolo_control/gorouter_refresh_stream.dart';
 import 'package:pertolo_control/home_screen.dart';
+import 'package:pertolo_control/pertolo_item.dart';
 
 class App extends StatelessWidget {
   App({super.key});
@@ -19,19 +21,33 @@ class App extends StatelessWidget {
   static const String buildNumber = '1';
   static const Duration animationDuration = Duration(milliseconds: 250);
 
+  static late List<String> categories = [];
+
+  Future<void> _loadCategories() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('game').get();
+      categories = snapshot.docs.map((doc) => doc.id).toList();
+    } catch (e) {
+      categories = [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: name,
-      theme: _themeData,
-      builder: (BuildContext context, Widget? child) {
-        return MaterialApp.router(
-            routerConfig: _router,
-            debugShowCheckedModeBanner: false,
-            title: App.name,
-            theme: _themeData);
-      },
-    );
+    return FutureBuilder(
+        builder: ((context, snapshot) => MaterialApp(
+              title: name,
+              theme: _themeData,
+              builder: (BuildContext context, Widget? child) {
+                return MaterialApp.router(
+                    routerConfig: _router,
+                    debugShowCheckedModeBanner: false,
+                    title: App.name,
+                    theme: _themeData);
+              },
+            )),
+        future: _loadCategories());
   }
 
   final GoRouter _router = GoRouter(
@@ -82,15 +98,16 @@ class App extends StatelessWidget {
             name: 'create',
             path: 'create',
             builder: (BuildContext context, GoRouterState state) {
-              //query params
-              String? pertoloItemId = state.queryParams['pertoloItemId'];
-              String? pertoloItemCategory =
-                  state.queryParams['pertoloItemCategory'];
-              String? pertoloItemType = state.queryParams['pertoloItemType'];
+              return const CreateScreen();
+            },
+          ),
+          GoRoute(
+            name: 'editItem',
+            path: 'editItem',
+            builder: (BuildContext context, GoRouterState state) {
+              final PertoloItem pertoloItem = state.extra as PertoloItem;
               return CreateScreen(
-                pertoloItemCategory: pertoloItemCategory,
-                pertoloItemId: pertoloItemId,
-                pertoloItemType: pertoloItemType,
+                pertoloItem: pertoloItem,
               );
             },
           ),

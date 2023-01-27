@@ -7,113 +7,32 @@ import 'package:pertolo_control/screen_container.dart';
 import 'package:pertolo_control/app.dart';
 import 'package:pertolo_control/pertolo_item.dart';
 
-class CreateScreen extends StatelessWidget {
-  final String? pertoloItemId;
-  final String? pertoloItemCategory;
-  final String? pertoloItemType;
-  const CreateScreen(
-      {super.key,
-      this.pertoloItemId,
-      this.pertoloItemCategory,
-      this.pertoloItemType});
-  Future<List<String>> _loadCategories() async {
-    try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('game').get();
-      return snapshot.docs.map((doc) => doc.id).toList();
-    } catch (e) {
-      return [];
-    }
-  }
-
-  Future<PertoloItem?> _loadPertoloItem() async {
-    if (pertoloItemId == null ||
-        pertoloItemCategory == null ||
-        pertoloItemType == null) {
-      return null;
-    }
-    try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('game')
-          .doc(pertoloItemCategory)
-          .collection(pertoloItemType!)
-          .doc(pertoloItemId)
-          .get();
-      return PertoloItem.fromMap(
-          snapshot.id,
-          snapshot.data() as Map<String, dynamic>,
-          pertoloItemCategory!,
-          ItemType.values
-              .firstWhere((element) => element.name == pertoloItemType));
-    } catch (e) {
-      return null;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      builder: ((context, pertoloSnapshot) {
-        if (pertoloSnapshot.connectionState == ConnectionState.done) {
-          if (pertoloSnapshot.hasError) {
-            return const Text(
-                "Cannot load pertolo item data. No internet connection?");
-          }
-          return FutureBuilder(
-            builder: ((context, categoriesSnapshot) {
-              if (categoriesSnapshot.connectionState == ConnectionState.done) {
-                if (categoriesSnapshot.data == null ||
-                    categoriesSnapshot.hasError) {
-                  return const Text(
-                      "Cannot load categories data. No internet connection?");
-                }
-                return CreateForm(
-                    categories: categoriesSnapshot.data!,
-                    pertoloItem: pertoloSnapshot.data);
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            }),
-            future: _loadCategories(),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      }),
-      future: _loadPertoloItem(),
-    );
-  }
-}
-
-class CreateForm extends StatefulWidget {
-  final List<String> categories;
+class CreateScreen extends StatefulWidget {
   final PertoloItem? pertoloItem;
-  const CreateForm({super.key, required this.categories, this.pertoloItem});
+  const CreateScreen({super.key, this.pertoloItem});
 
   @override
-  State<CreateForm> createState() => _CreateFormState();
+  State<CreateScreen> createState() => _CreateScreenState();
 }
 
-class _CreateFormState extends State<CreateForm> {
+class _CreateScreenState extends State<CreateScreen> {
   String content = "";
   String category = "normal";
   ItemType type = ItemType.task;
 
   @override
   void initState() {
-    super.initState();
     if (_pertoloItemIsSet()) {
-      setState(() {
-        content = widget.pertoloItem!.content;
-        category = widget.pertoloItem!.category;
-        type = widget.pertoloItem!.type;
-      });
+      content = widget.pertoloItem!.content;
+      category = widget.pertoloItem!.category;
+      type = widget.pertoloItem!.type;
     }
+    super.initState();
   }
 
   void _updateItem(BuildContext context) async {
     String message = await PertoloItem.updateItem(
-        content, category, type, widget.pertoloItem!);
+        widget.pertoloItem!, content, category, type);
 
     if (!mounted) return;
     ScaffoldMessenger.of(context)
@@ -156,27 +75,28 @@ class _CreateFormState extends State<CreateForm> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                Container(
-                    constraints: BoxConstraints(minHeight: height),
-                    width: width,
-                    child: TextField(
-                      minLines: 1,
-                      maxLines: 5,
-                      style: ThemeData.dark().textTheme.labelMedium,
-                      key: const ValueKey('content'),
-                      controller: TextEditingController(text: content),
-                      onChanged: (value) => content = value,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: 'Aufgabe/Frage',
-                        labelStyle: ThemeData.dark().textTheme.labelMedium,
-                      ),
-                    )),
+                SafeArea(
+                    child: Container(
+                        constraints: BoxConstraints(minHeight: height),
+                        width: width,
+                        child: TextField(
+                          minLines: 1,
+                          maxLines: 5,
+                          style: ThemeData.dark().textTheme.labelMedium,
+                          key: const Key('content'),
+                          controller: TextEditingController(text: content),
+                          onChanged: (value) => content = value,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: 'Aufgabe/Frage',
+                            labelStyle: ThemeData.dark().textTheme.labelMedium,
+                          ),
+                        ))),
 
                 // dropdownbutton for category
 
                 PertoloDropdown<String>(
-                    items: widget.categories
+                    items: App.categories
                         .map<DropdownMenuItem<String>>((String val) {
                       return DropdownMenuItem<String>(
                         value: val,

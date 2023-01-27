@@ -7,44 +7,35 @@ import 'package:pertolo_control/screen_container.dart';
 import 'package:pertolo_control/app.dart';
 import 'package:pertolo_control/pertolo_item.dart';
 
-class EditScreen extends StatelessWidget {
+class EditScreen extends StatefulWidget {
   const EditScreen({super.key});
-  Future<List<String>> _loadCategories() async {
-    try {
-      QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('game').get();
-      return snapshot.docs.map((doc) => doc.id).toList();
-    } catch (e) {
-      return [];
+
+  @override
+  State<EditScreen> createState() => _EditScreenState();
+}
+
+class _EditScreenState extends State<EditScreen> {
+  List<PertoloItem> allItems = [];
+  List<PertoloItem> items = [];
+  String category = "normal";
+  ItemType type = ItemType.task;
+  bool _isMyTasksFilter = false;
+
+  void _filterMyTasks(bool change) {
+    bool isActive = change ? !_isMyTasksFilter : _isMyTasksFilter;
+    if (isActive) {
+      items = allItems
+          .where((element) =>
+              element.creator == FirebaseAuth.instance.currentUser!.uid)
+          .toList();
+    } else {
+      items = allItems;
     }
+    setState(() {
+      _isMyTasksFilter = isActive;
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        builder: ((context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data == null || snapshot.hasError) {
-              return const Text("Cannot load categories data");
-            }
-            return EditList(categories: snapshot.data!);
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        }),
-        future: _loadCategories());
-  }
-}
-
-class EditList extends StatefulWidget {
-  final List<String> categories;
-  const EditList({super.key, required this.categories});
-
-  @override
-  State<EditList> createState() => _EditListState();
-}
-
-class _EditListState extends State<EditList> {
   @override
   void initState() {
     super.initState();
@@ -52,16 +43,10 @@ class _EditListState extends State<EditList> {
   }
 
   void _updatePertoloItems() async {
-    List<PertoloItem> items =
-        await PertoloItem.loadPertoloItems(category, type);
-    setState(() {
-      this.items = items;
-    });
+    allItems = await PertoloItem.loadPertoloItems(category, type);
+    _filterMyTasks(false);
   }
 
-  List<PertoloItem> items = [];
-  String category = "normal";
-  ItemType type = ItemType.task;
   @override
   Widget build(BuildContext context) {
     return ScreenContainer(
@@ -69,8 +54,7 @@ class _EditListState extends State<EditList> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           PertoloDropdown(
-              items:
-                  widget.categories.map<DropdownMenuItem<String>>((String val) {
+              items: App.categories.map<DropdownMenuItem<String>>((String val) {
                 return DropdownMenuItem<String>(
                   value: val,
                   child: Text(val),
@@ -92,7 +76,20 @@ class _EditListState extends State<EditList> {
                 type = val!;
                 _updatePertoloItems();
               }),
-          const SizedBox(height: 45),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _filterMyTasks(true),
+                child: Chip(
+                  label: const Text("Meine Aufgaben",
+                      style: TextStyle(color: App.primaryColor)),
+                  avatar: const Icon(Icons.person, color: App.primaryColor),
+                  backgroundColor:
+                      _isMyTasksFilter ? App.secondaryColor : App.whiteColor,
+                ),
+              ),
+            ],
+          ),
           Expanded(
               child: ListView.separated(
             shrinkWrap: true,

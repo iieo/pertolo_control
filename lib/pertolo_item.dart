@@ -113,9 +113,23 @@ class PertoloItem {
     return 'Aufgabe gespeichert';
   }
 
-  static Future<String> updateItem(String content, String category,
-      ItemType type, PertoloItem oldItem) async {
-    await oldItem.delete();
+  static Future<void> deleteItem(
+      String id, String category, ItemType type) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('game')
+          .doc(category)
+          .collection(type.name)
+          .doc(id)
+          .delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<String> updateItem(PertoloItem oldItem, String content,
+      String category, ItemType type) async {
+    PertoloItem.deleteItem(oldItem.id, category, type);
     if (content.trim().isEmpty || content.trim().length < 5) {
       return 'Bitte gib einen Inhalt ein';
     }
@@ -123,7 +137,7 @@ class PertoloItem {
       'creatorUid': FirebaseAuth.instance.currentUser!.uid,
       'creator': FirebaseAuth.instance.currentUser!.displayName!,
       'content': content,
-      'created': Timestamp.fromDate(oldItem.created),
+      'created': oldItem.created,
       'updated': Timestamp.now(),
     };
     try {
@@ -131,7 +145,8 @@ class PertoloItem {
           .collection('game')
           .doc(category)
           .collection(type.name)
-          .add(docData);
+          .doc(oldItem.id)
+          .set(docData);
     } catch (e) {
       return 'Fehler beim Speichern: $e';
     }
