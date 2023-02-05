@@ -3,14 +3,18 @@ import 'package:pertolo_control/app.dart';
 
 class ScreenContainer extends StatelessWidget {
   final Widget child;
-  const ScreenContainer({super.key, required this.child});
+  final EdgeInsetsGeometry? padding;
+  const ScreenContainer({super.key, required this.child, this.padding});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: App.primaryColor,
         body: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+            padding: padding ??
+                EdgeInsets.symmetric(
+                    horizontal: App.getPaddingHorizontal(context),
+                    vertical: 50),
             child: child));
   }
 }

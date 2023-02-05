@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pertolo_control/app.dart';
 import 'package:pertolo_control/screen_container.dart';
 import 'package:pertolo_control/login.dart';
 import 'package:pertolo_control/register.dart';
@@ -24,7 +25,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return ScreenContainer(
         child: Center(
             child: Container(
-      width: MediaQuery.of(context).size.width - 100,
+      width: App.getMaxWidth(context),
       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       alignment: Alignment.center,
       child: Column(

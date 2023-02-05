@@ -10,7 +10,7 @@ class PertoloButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = max(200, MediaQuery.of(context).size.width - 100);
+    double width = App.getMaxWidth(context);
     double height = 60;
     return SizedBox(
         height: height,

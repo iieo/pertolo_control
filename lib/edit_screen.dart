@@ -26,7 +26,7 @@ class _EditScreenState extends State<EditScreen> {
     if (isActive) {
       items = allItems
           .where((element) =>
-              element.creator == FirebaseAuth.instance.currentUser!.uid)
+              element.creatorUid == FirebaseAuth.instance.currentUser!.uid)
           .toList();
     } else {
       items = allItems;
@@ -50,6 +50,7 @@ class _EditScreenState extends State<EditScreen> {
   @override
   Widget build(BuildContext context) {
     return ScreenContainer(
+      padding: const EdgeInsets.only(top: 50),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -76,20 +77,30 @@ class _EditScreenState extends State<EditScreen> {
                 type = val!;
                 _updatePertoloItems();
               }),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () => _filterMyTasks(true),
-                child: Chip(
-                  label: const Text("Meine Aufgaben",
-                      style: TextStyle(color: App.primaryColor)),
-                  avatar: const Icon(Icons.person, color: App.primaryColor),
-                  backgroundColor:
-                      _isMyTasksFilter ? App.secondaryColor : App.whiteColor,
-                ),
-              ),
-            ],
-          ),
+          Container(
+              padding: EdgeInsets.symmetric(
+                  vertical: 10, horizontal: App.getPaddingHorizontal(context)),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => _filterMyTasks(true),
+                    child: Chip(
+                      label: Text("Meine Aufgaben",
+                          style: TextStyle(
+                              color: _isMyTasksFilter
+                                  ? App.whiteColor
+                                  : App.primaryColor)),
+                      avatar: Icon(Icons.person,
+                          color: _isMyTasksFilter
+                              ? App.whiteColor
+                              : App.primaryColor),
+                      backgroundColor: _isMyTasksFilter
+                          ? App.secondaryColor
+                          : App.whiteColor,
+                    ),
+                  ),
+                ],
+              )),
           Expanded(
               child: ListView.separated(
             shrinkWrap: true,

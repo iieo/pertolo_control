@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pertolo_control/app.dart';
 import 'firebase_options.dart';
@@ -13,6 +14,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 void main() async {
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

@@ -64,7 +64,6 @@ class _CreateScreenState extends State<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width - 100;
     double height = 60;
     return ScreenContainer(
       child: Center(
@@ -78,7 +77,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 SafeArea(
                     child: Container(
                         constraints: BoxConstraints(minHeight: height),
-                        width: width,
+                        width: App.getMaxWidth(context),
                         child: TextField(
                           minLines: 1,
                           maxLines: 5,

@@ -12,6 +12,15 @@ import 'package:pertolo_control/pertolo_item.dart';
 class App extends StatelessWidget {
   App({super.key});
 
+  static double getMaxWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width -
+        2 * getPaddingHorizontal(context);
+  }
+
+  static double getPaddingHorizontal(BuildContext context) {
+    return MediaQuery.of(context).size.width > 500 ? 120 : 60;
+  }
+
   static const Color primaryColor = Color(0xFF060e33);
   static const int white = 200;
   static const Color whiteColor = Color.fromARGB(255, 228, 226, 223);
@@ -21,7 +30,7 @@ class App extends StatelessWidget {
   static const String buildNumber = '1';
   static const Duration animationDuration = Duration(milliseconds: 250);
 
-  static late List<String> categories = [];
+  static List<String> categories = [];
 
   Future<void> _loadCategories() async {
     try {

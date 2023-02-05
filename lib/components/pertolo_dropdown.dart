@@ -21,7 +21,7 @@ class PertoloDropdown<T> extends StatefulWidget {
 class _PertoloDropdownState<T> extends State<PertoloDropdown> {
   @override
   Widget build(BuildContext context) {
-    double width = max(200, MediaQuery.of(context).size.width - 100);
+    double width = App.getMaxWidth(context);
     double height = 60;
     return SizedBox(
         width: width,
